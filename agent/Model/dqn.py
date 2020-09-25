@@ -28,7 +28,11 @@ class ModelParameter:
     mini_batch_size: int = 20
     input_size: int = AP.T + 1
     output_size: int = 1
-    epsilon = 0.3 # epsilon-greadyでmaxを取得する
+    # epsilon-greadyでmaxを取得する
+    # epsilonは指数関数的に減少させる
+    epsilon_start = 0.7
+    epsilon_decay = 500
+    epsilon_end = 0.05
     epoch: int = 5
 
 class DQN(AbstractModel):
@@ -47,6 +51,7 @@ class DQN(AbstractModel):
         # self.criterion = nn.MSELoss()
         self.criterion = F.smooth_l1_loss
         self.replay_memory = ReplayMemory[Transition](ModelParameter.memory_capacity)
+        self.select_action_count = 0
 
     def _build_input(self, state: List[int], action: int) -> torch.Tensor:
         """
@@ -69,9 +74,11 @@ class DQN(AbstractModel):
     def get_action(self, state:List[int]) -> int:
         """
         行動の出力
+        epsilon-greedy, epsilonを指数関数的に減少させる
         """
         epsilon: float = random.random()
-        if epsilon > ModelParameter.epsilon:
+        epsilon_threshold = ModelParameter.epsilon_end + (ModelParameter.epsilon_start - ModelParameter.epsilon_end) * np.exp(-1. * self.select_action_count / ModelParameter.epsilon_decay)
+        if epsilon > epsilon_threshold:
             # random
             return random.sample(AP.REWARD, 1)[0]
 
@@ -90,19 +97,20 @@ class DQN(AbstractModel):
         """
         for i in range(ModelParameter.epoch):
             batch_size: float = min(ModelParameter.mini_batch_size, len(self.replay_memory))
-            minibatch: List[Transition] = self.replay_memory.sample(batch_size)
+            minibatch : List[Transition] = self.replay_memory.sample(batch_size)
             target_data: List[float] = [] # 教師データ
             # build target data
             for element in minibatch:
                 next_q_max: float = -sys.float_info.max
                 next_action: int = 0
+                # 行動選択・Q値の評価(DDQNではここが分離される)
                 for next_move in range(AP.C):
                     next_q: float = self._predict(element.next_state, next_move)
                     if next_q_max < next_q:
                         next_q_max = next_q
                         # next_action = next_move
-                    target: float = element.reward + ModelParameter.gamma * next_q_max
-                    target_data.append(target)
+                target: float = element.reward + ModelParameter.gamma * next_q_max
+                target_data.append(target)
             
             # モデルの訓練
             self.model.train()
@@ -113,7 +121,7 @@ class DQN(AbstractModel):
                 self.optimiser.zero_grad()
                 loss.backward(retain_graph=True)
                 self.optimiser.step()
-
+            
     def add_memory(self, t: Transition):
         self.replay_memory.add(t)
 
@@ -122,3 +130,6 @@ class DQN(AbstractModel):
     
     def get_modelname(self) -> str:
         return self.__class__.__name__
+    
+    def eval(self):
+        self.model.eval()
