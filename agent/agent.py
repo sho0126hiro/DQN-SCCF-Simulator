@@ -13,6 +13,7 @@ from Evaluator.random_evaluator import RandomEvaluator
 from Evaluator.humanized_evaluator import HumanizedEvaluator
 from config import AgentParameter as AP
 from logger import BeheviorLogger
+from analyzer import Analyzer
 
 class Agent:
     
@@ -25,6 +26,7 @@ class Agent:
         self._init_state()
         self.evaluator = HumanizedEvaluator(list(self.state))
         self.logger = BeheviorLogger()
+        self.analyzer = Analyzer()
     
     def _init_state(self):
         for i in range(AP.T):
@@ -34,7 +36,7 @@ class Agent:
         self.state.append(action)
 
     def run(self):
-        for t in range(AP.TRY):
+        for t in range(int(AP.EPISODE/AP.BATCH_SIZE)):
             if t % 100 == 0: print(t)
             for episode in range(AP.BATCH_SIZE):
                 if self.modelname != "REINFORCE": self.model.eval()
@@ -49,8 +51,10 @@ class Agent:
                 )
                 self.logger.add(s, action, reward)
             self.model.update()
-        self.logger.save_reward_graph(self)
-        self.logger.save_csv(self)
+        # self.logger.save_reward_grxaph(self)
+        output_filename = self.logger.save_csv(self)
+        result_dataframe = self.analyzer.read_df(output_filename)
+        self.analyzer.ep_action_split_n(result_dataframe, 3)
 
 if __name__ == "__main__":
     a = Agent()

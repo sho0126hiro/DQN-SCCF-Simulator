@@ -9,6 +9,7 @@ import pandas as pd
 # Internal Import
 from config import AgentParameter as AP
 from config import LoggerConfig as LC
+from analyzer import Analyzer
 
 class BaseLogger:
     TIME_FORMAT = "%Y%m%d_%H%M%S"
@@ -78,22 +79,36 @@ class BeheviorLogger(BaseLogger):
     
     def _get_settings(self, agent):
         return [
-            "model: " + self.agent.modelname,
-            "episode: " + str(AP.TRY),
+            "model: " + agent.modelname,
+            "episode: " + str(AP.EPISODE),
             "T: "+ str(AP.T),
             "Num of Category: "+ str(AP.C),
-            "M(Batch): "+ str(AP.BATCH_SIZE),
+            "M(Batch): "+ str(AP.BATCH_SIZE)
         ]
 
+    def _make_column_name(self, h, s):
+        ret = []
+        for i in range(AP.T, 0, -1):
+            ret.append("s-" + str(i))
+        ret.append("a")
+        ret.append("r")
+        if len(h[0]) < len(s):
+            for _ in range(len(s) - len(h[0])):
+                ret.append("none")
+        return ret
+    
     def save_csv(self, agent):
         h: List[int] = self._build_history()
         s = self._get_settings(agent)
-        df = pd.DataFrame(h)
+        h.append(s)
+        df = pd.DataFrame(h, columns=self._make_column_name(h,s))
         fname = self._build_file_name(
             self.get_now_time_str(),
             agent.model.get_modelname()
         )
         df.to_csv(LC.OUTPUT_ROOT_PATH_LOG + fname + ".csv")
+        output_filename = LC.OUTPUT_ROOT_PATH_LOG + fname + ".csv"
+        return output_filename
 
 if __name__ == "__main__":
     pass
