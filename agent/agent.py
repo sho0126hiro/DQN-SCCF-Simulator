@@ -18,8 +18,8 @@ from analyzer import Analyzer
 class Agent:
     
     def __init__(self):
-        self.model = REINFORCE()
-        # self.model = DQN()
+        # self.model = REINFORCE()
+        self.model = DQN()
         # self.model = DDQN()
         self.modelname = self.model.get_modelname()
         self.state: Deque = deque(maxlen=AP.T) # [t回前のc, t-1回目のc, t-2..., 1回前のc]
@@ -37,7 +37,7 @@ class Agent:
 
     def run(self):
         for t in range(int(AP.EPISODE/AP.BATCH_SIZE)):
-            if t % 100 == 0: print(t)
+            print(t)
             for episode in range(AP.BATCH_SIZE):
                 if self.modelname != "REINFORCE": self.model.eval()
                 s: List[int] = list(self.state)

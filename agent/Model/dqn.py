@@ -23,16 +23,16 @@ class Transition(NamedTuple):
 
 class ModelParameter:
     alpha: float = 0.01 # learning Rate
-    memory_capacity: int = 50
+    memory_capacity: int = 100
     gamma: float = 0.1 # discount rate
-    mini_batch_size: int = 20
+    mini_batch_size: int = 50 # experience replay minibatch
     input_size: int = AP.T + 1
     output_size: int = 1
     # epsilon-greadyでmaxを取得する
     # epsilonは指数関数的に減少させる
-    epsilon_start = 0.7
-    epsilon_decay = 500
-    epsilon_end = 0.05
+    epsilon_start = 0.2
+    epsilon_decay = 1000
+    epsilon_end = 0.2
     epoch: int = 5
 
 class DQN(AbstractModel):
@@ -41,11 +41,11 @@ class DQN(AbstractModel):
     """
     def __init__(self):
         self.model = nn.Sequential()
-        self.model.add_module('fc1', nn.Linear(ModelParameter.input_size,32))
+        self.model.add_module('fc1', nn.Linear(ModelParameter.input_size,50))
         self.model.add_module('relu1', nn.ReLU())
-        self.model.add_module('fc2', nn.Linear(32,32))
+        self.model.add_module('fc2', nn.Linear(50,50))
         self.model.add_module('relu2', nn.ReLU())
-        self.model.add_module('fc3', nn.Linear(32, ModelParameter.output_size))
+        self.model.add_module('fc3', nn.Linear(50, ModelParameter.output_size))
         self.optimiser = optim.Adam(self.model.parameters(), 
                                     lr = ModelParameter.alpha)
         # self.criterion = nn.MSELoss()
@@ -78,9 +78,11 @@ class DQN(AbstractModel):
         """
         epsilon: float = random.random()
         epsilon_threshold = ModelParameter.epsilon_end + (ModelParameter.epsilon_start - ModelParameter.epsilon_end) * np.exp(-1. * self.select_action_count / ModelParameter.epsilon_decay)
-        if epsilon > epsilon_threshold:
-            # random
-            return random.sample(AP.REWARD, 1)[0]
+        self.select_action_count += 1
+        if epsilon < epsilon_threshold:
+            # return action randomly
+            # print(epsilon_threshold)
+            return random.choice([i for i in range(AP.C)])
 
         q_max: float = -sys.float_info.max
         action: int = 0

@@ -52,7 +52,8 @@ class HumanizedEvaluator(AbstractEvaluator):
         """
         if AP.C == 6:
             return
-        idx_list: List[int] = random.choices([i for i in range(6)], k=AP.C)
+        # idx_list: List[int] = random.choices([i for i in range(6)], k=AP.C)
+        idx_list: List[int] =[i % 6 for i in range(AP.C)]
         p = []
         for r in self.prob:
             tmp = []
@@ -60,6 +61,7 @@ class HumanizedEvaluator(AbstractEvaluator):
                 tmp.append(r[idx])
             p.append(tmp)
         self.prob = p
+        print(idx_list)
 
     def _roulette(self, list_: List[float]) -> int:
         """
