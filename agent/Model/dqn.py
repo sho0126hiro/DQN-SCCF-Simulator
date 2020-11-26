@@ -135,3 +135,18 @@ class DQN(AbstractModel):
     
     def eval(self):
         self.model.eval()
+    
+    def display_config(self):
+        print("alpha (learning rate): ", ModelParameter.alpha)
+        print("memory_capacity: ", ModelParameter.memory_capacity)
+        print("gamma (Q discount rate)", ModelParameter.gamma)
+        print()
+        print("mini_batch_size", ModelParameter.mini_batch_size)
+        print("input_size: ", ModelParameter.input_size)
+        print("output_size: ", ModelParameter.output_size)
+        print()
+        print("epsilon_start: ", ModelParameter.epsilon_start)
+        print("epsilon_end: ", ModelParameter.epsilon_end)
+        print("epsilon_decay: ", ModelParameter.epsilon_decay)
+        print()
+        print("epoch: ", ModelParameter.epoch)

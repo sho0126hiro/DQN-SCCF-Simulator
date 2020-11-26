@@ -34,3 +34,11 @@ class AbstractModel(metaclass=ABCMeta):
         メモリに格納するTransitionObjectを作成する
         """
         pass
+
+    @abstractmethod
+    def display_config(self):
+        """
+        modelパラメータなどの設定を表示する
+        """
+        pass
+    

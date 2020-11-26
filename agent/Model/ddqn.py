@@ -66,3 +66,18 @@ class DDQN(AbstractModel):
     
     def eval(self):
         self.actDQN.model.eval()
+    
+    def display_config(self):
+        print("alpha (learning rate): ", DQNMP.alpha)
+        print("memory_capacity: ", DQNMP.memory_capacity)
+        print("gamma (Q discount rate)", DQNMP.gamma)
+        print()
+        print("mini_batch_size", DQNMP.mini_batch_size)
+        print("input_size: ", DQNMP.input_size)
+        print("output_size: ", DQNMP.output_size)
+        print()
+        print("epsilon_start: ", DQNMP.epsilon_start)
+        print("epsilon_end: ", DQNMP.epsilon_end)
+        print("epsilon_decay: ", DQNMP.epsilon_decay)
+        print()
+        print("epoch: ", DQNMP.epoch)

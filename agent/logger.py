@@ -1,6 +1,7 @@
 # Standard Import
 from typing import NamedTuple, List
 from datetime import datetime
+import os
 
 # ThirdParty Import
 import matplotlib.pyplot as plt
@@ -13,8 +14,14 @@ from analyzer import Analyzer
 
 class BaseLogger:
     TIME_FORMAT = "%Y%m%d_%H%M%S"
+    first_try = True
+
     def get_now_time_str(self):
-        return datetime.now().strftime(self.TIME_FORMAT)
+        if(self.first_try):
+            self.t = datetime.now().strftime(self.TIME_FORMAT)
+            os.mkdir(LC.OUTPUT_ROOT_PATH_LOG + self.t )
+            self.first_try = False
+        return self.t
 
 class BehaviorHistory(NamedTuple):
     state: List[int]
@@ -97,18 +104,22 @@ class BeheviorLogger(BaseLogger):
                 ret.append("none")
         return ret
     
-    def save_csv(self, agent):
+    def save_csv(self, agent, index):
         h: List[int] = self._build_history()
         s = self._get_settings(agent)
         h.append(s)
         df = pd.DataFrame(h, columns=self._make_column_name(h,s))
         fname = self._build_file_name(
-            self.get_now_time_str(),
-            agent.model.get_modelname()
+            agent.model.get_modelname(),
+            index
         )
-        df.to_csv(LC.OUTPUT_ROOT_PATH_LOG + fname + ".csv")
-        output_filename = LC.OUTPUT_ROOT_PATH_LOG + fname + ".csv"
+        output_filename = LC.OUTPUT_ROOT_PATH_LOG + self.get_now_time_str() + "/" + fname + ".csv"
+        print(output_filename)
+        df.to_csv(output_filename)
         return output_filename
+    
+    def reset(self):
+        self.history: List[BehaviorHistory] = []
 
 if __name__ == "__main__":
     pass

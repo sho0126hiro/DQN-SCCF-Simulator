@@ -114,3 +114,8 @@ class REINFORCE(AbstractModel):
     
     def get_modelname(self) -> str:
         return self.__class__.__name__
+    
+    def display_config(self):
+        print("eta (learning rate): ", ModelParameter.eta)
+        print("beta: ", ModelParameter.beta)
+        print("init_theta: ", ModelParameter.init_theta)

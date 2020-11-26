@@ -5,7 +5,12 @@ import csv
 from config import AgentParameter as AP
 from config import LoggerConfig as LC
 
+ANALYZE_ROOT_PATH = "./analyze/log/"
+
 class Analyzer:
+
+    def __init__(self):
+        self.out = []
 
     def read_df(self, filename):
         """
@@ -42,15 +47,39 @@ class Analyzer:
         
         action_count.tolist()
         action_rate.tolist()
-        out = []
+        o_count = []
+        o_rate = []
         for c, r in zip(action_count, action_rate):
-            out.append(c.tolist())
-            out.append(r.tolist())
-        self.csv_write("out.csv", out)
+            x = []
+            o_count.extend(c.tolist())
+            o_rate.extend(r.tolist())
+        o = []
+        o.extend(o_rate)
+        o.extend(o_count)
+        return o
 
 if __name__ == "__main__":
     a = Analyzer()
-    fname = LC.OUTPUT_ROOT_PATH_LOG + "20200925_234451_REINFORCE.csv"
-    df = a.read_df(fname)
-    a.ep_action_split_n(df, 3)
+    DIR_NAME = "20201104_011204"
+    fname = LC.OUTPUT_ROOT_PATH_LOG + DIR_NAME + "/" + AP.ALGORISM
+    for i in range(AP.TRY):
+        df = a.read_df(fname +"_"+ str(i) + ".csv")
+        a.out.append(a.ep_action_split_n(df, 3))
+    tmp = np.array(a.out)
+    ave = np.mean(tmp, axis=0)
+    mi = np.min(tmp, axis=0)
+    ma = np.max(tmp, axis=0)
+    var = np.var(tmp, axis=0)
+    std = np.std(tmp, axis=0)
+    stde = np.std(tmp, axis=0) / np.sqrt(AP.TRY)
+    med = np.median(tmp, axis=0)
 
+    a.out.append(ave.tolist())
+    a.out.append(var.tolist())
+    a.out.append(std.tolist())
+    a.out.append(stde.tolist())
+    a.out.append(mi.tolist())
+    a.out.append(ma.tolist())
+    a.out.append(med.tolist())
+
+    a.csv_write(ANALYZE_ROOT_PATH + DIR_NAME +".csv", a.out)
