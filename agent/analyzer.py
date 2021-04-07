@@ -60,11 +60,11 @@ class Analyzer:
 
 if __name__ == "__main__":
     a = Analyzer()
-    DIR_NAME = "20201104_011204"
+    DIR_NAME = "20210325_022627"
     fname = LC.OUTPUT_ROOT_PATH_LOG + DIR_NAME + "/" + AP.ALGORISM
     for i in range(AP.TRY):
         df = a.read_df(fname +"_"+ str(i) + ".csv")
-        a.out.append(a.ep_action_split_n(df, 3))
+        a.out.append(a.ep_action_split_n(df, 10))
     tmp = np.array(a.out)
     ave = np.mean(tmp, axis=0)
     mi = np.min(tmp, axis=0)
