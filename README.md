@@ -7,4 +7,6 @@
 
 ## データ分析
 
-`agent/analyzer.py` DIR_NAMEで対象ディレクトリ名を設定
+`cd agent`
+`python3 analyzer.py`
+ファイル内の`DIR_NAME`で対象ディレクトリ名を設定

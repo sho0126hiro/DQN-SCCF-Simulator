@@ -35,36 +35,57 @@ class Analyzer:
         action_count = np.zeros((n,AP.C))
         action_rate = np.zeros((n,AP.C))
         count = np.zeros(n)
-        split_count = np.zeros(AP.C)
         for index, action in enumerate(df["a"]):
+            print(index)
             action = int(action)
             for j in range(n):
                 if (j) * len(df) / n <= index < (j+1) * len(df) / n:
                     action_count[j][action] += 1
                     count[j] += 1
         for index, action in enumerate(action_count):
-            action_rate[index] = action/count[index]
-        
-        action_count.tolist()
-        action_rate.tolist()
-        o_count = []
+            if count[index] == 0:
+                action_rate[index] = 0.0
+            else:
+                action_rate[index] = action/count[index]
+        # action_count.tolist()
+        # o_count = []
         o_rate = []
-        for c, r in zip(action_count, action_rate):
-            x = []
-            o_count.extend(c.tolist())
-            o_rate.extend(r.tolist())
+        # for c, r in zip(action_count, action_rate):
+        for r in action_rate.tolist():
+            o_rate.extend(r)
         o = []
-        o.extend(o_rate)
-        o.extend(o_count)
+        o.extend(o_rate) # o #  : n × 状態数
+        # o.extend(o_count)
         return o
+
+    def build_out(self, old, split, ctgry):
+        """
+        縦 8 * 横（カテゴリ数 * 分割数(split)） の配列 oldを
+        縦 分割数 * 横（カテゴリ数*8）に変換する
+        ctgry: 発話カテゴリ数
+        """
+        new = []
+        for i in range(split):
+            tmp = []
+            for j in range(8):
+                tmp.extend(old[j][i*ctgry:(i+1)*ctgry])
+            new.append(tmp)
+        return new
+
+
+
+
+
+
 
 if __name__ == "__main__":
     a = Analyzer()
-    DIR_NAME = "20210325_022627"
+    DIR_NAME = "DQN_LONG"
     fname = LC.OUTPUT_ROOT_PATH_LOG + DIR_NAME + "/" + AP.ALGORISM
+    SPLIT = 1500 # 分割数
     for i in range(AP.TRY):
         df = a.read_df(fname +"_"+ str(i) + ".csv")
-        a.out.append(a.ep_action_split_n(df, 10))
+        a.out.append(a.ep_action_split_n(df, SPLIT))
     tmp = np.array(a.out)
     ave = np.mean(tmp, axis=0)
     mi = np.min(tmp, axis=0)
@@ -82,4 +103,6 @@ if __name__ == "__main__":
     a.out.append(ma.tolist())
     a.out.append(med.tolist())
 
-    a.csv_write(ANALYZE_ROOT_PATH + DIR_NAME +".csv", a.out)
+    a.out = a.build_out(a.out, SPLIT, int(len(a.out[0])/SPLIT))
+    print(len(a.out),len(a.out[0]))
+    a.csv_write(ANALYZE_ROOT_PATH + DIR_NAME +".test.csv", a.out)
