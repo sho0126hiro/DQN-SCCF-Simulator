@@ -1,4 +1,7 @@
-# Standard Import 
+"""
+確率的行動選択をするDQN
+"""
+# Standard Import
 import sys
 from typing import List, NamedTuple
 import random
@@ -38,7 +41,7 @@ class ModelParameter:
     epoch: int = 5
 
 
-class DQN(AbstractModel):
+class DQN_STOC(AbstractModel):
     """
     Deep-Q-Networkのモデル
     """
@@ -75,28 +78,49 @@ class DQN(AbstractModel):
         q_value: float = float(self.model(in_))
         return q_value
 
+    def _softmax(self, a: List[float]):
+        a = np.array(a)
+        a_max = max(a)
+        x = np.exp(a - a_max)
+        u = np.sum(x)
+        return x / u
+
+    def _get_index_by_q_values(self, q_values: List[float]) -> int:
+        indices = [i for i in range(AP.C)]
+        tmp = self._softmax(q_values)
+        ind = np.random.choice(indices, p=tmp)
+        return ind
+
+    def get_action_and_q(self, state: List[int]) -> [int, float]:
+        """
+        行動とその行動のQ値を返す。
+        """
+        epsilon: float = random.random()
+        epsilon_threshold = ModelParameter.epsilon_end + (
+                ModelParameter.epsilon_start - ModelParameter.epsilon_end) * np.exp(
+            -1. * self.select_action_count / ModelParameter.epsilon_decay)
+        self.select_action_count += 1
+        if epsilon < epsilon_threshold:
+            # return action randomly
+            action = random.choice([i for i in range(AP.C)])
+            q = self._predict(state, action)
+            return action, q
+        """
+        確率的行動選択
+        """
+        q_values: List[float] = []
+        for move in range(AP.C):
+            q: float = self._predict(state, move)
+            q_values.append(q)
+        action: int = self._get_index_by_q_values(q_values)
+        return action, q_values[action]
+
     def get_action(self, state: List[int]) -> int:
         """
         行動の出力
         epsilon-greedy, epsilonを指数関数的に減少させる
         """
-        epsilon: float = random.random()
-        epsilon_threshold = ModelParameter.epsilon_end + (
-                    ModelParameter.epsilon_start - ModelParameter.epsilon_end) * np.exp(
-            -1. * self.select_action_count / ModelParameter.epsilon_decay)
-        self.select_action_count += 1
-        if epsilon < epsilon_threshold:
-            # return action randomly
-            # print(epsilon_threshold)
-            return random.choice([i for i in range(AP.C)])
-
-        q_max: float = -sys.float_info.max
-        action: int = 0
-        for move in range(AP.C):
-            q: float = self._predict(state, move)
-            if q_max < q:
-                q_max = q
-                action = move
+        action, _ = self.get_action_and_q(state)
         return action
 
     def update(self):
@@ -109,15 +133,9 @@ class DQN(AbstractModel):
             target_data: List[float] = []  # 教師データ
             # build target data
             for element in minibatch:
-                next_q_max: float = -sys.float_info.max
-                next_action: int = 0
                 # 行動選択・Q値の評価(DDQNではここが分離される)
-                for next_move in range(AP.C):
-                    next_q: float = self._predict(element.next_state, next_move)
-                    if next_q_max < next_q:
-                        next_q_max = next_q
-                        # next_action = next_move
-                target: float = element.reward + ModelParameter.gamma * next_q_max
+                _, next_q = self.get_action_and_q(element.next_state)
+                target: float = element.reward + ModelParameter.gamma * next_q
                 target_data.append(target)
 
             # モデルの訓練

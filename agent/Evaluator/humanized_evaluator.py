@@ -36,10 +36,17 @@ class HumanizedEvaluator(AbstractEvaluator):
     """
     人間を模倣した評価器
     """
-    def __init__(self, init_state: int):
+    def __init__(self, init_state: List[int]):
         """
         @param init_state: メモリ初期化（直前の行動予測）用
         """
+        self.prob = ExTestUser02.prob
+        self._prob_init()
+        self.alpha: float = 0.8 # 減衰係数
+        self.bias: float = 0.001 # 0％の箇所にいれるバイアス
+        self.memory = EvaluatorMemory(init_state) # データ保存先
+
+    def change(self, init_state: List[int]):
         self.prob = ExTestUser01.prob
         self._prob_init()
         self.alpha: float = 0.8 # 減衰係数
@@ -233,6 +240,34 @@ class ExTestUser01: # 4,5,6 が特に評価が高いエージェント
             [0.2],
             [0.25],
             [0.2],
+        ]
+    ]
+
+class ExTestUser02: # 4,5,6 が特に評価が高いエージェント
+    prob =[
+        [ # r = 1
+            [0.1],
+            [0.1],
+            [0.7],
+            [0.7],
+            [0.2],
+            [0.1],
+        ],
+        [ # r = 0
+            [0.2],
+            [0.7],
+            [0.2],
+            [0.1],
+            [0.05],
+            [0.1],
+        ],
+        [ # r = -1
+            [0.7],
+            [0.2],
+            [0.1],
+            [0.2],
+            [0.75],
+            [0.8],
         ]
     ]
 

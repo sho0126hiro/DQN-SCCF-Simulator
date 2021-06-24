@@ -15,8 +15,7 @@ class Analyzer:
     def read_df(self, filename):
         """
         データフレーム取得（csvからimport)
-        データフレームの形式: 
-
+        データフレームの形式:
         """
         df = pd.read_csv(filename)
         df.drop(df.tail(1).index, inplace=True)
@@ -80,9 +79,14 @@ class Analyzer:
 
 if __name__ == "__main__":
     a = Analyzer()
-    DIR_NAME = "DQN_LONG"
+    print("input file dir path -> ")
+    dir_name = input()
+    if  dir_name== "no":
+        DIR_NAME = "20210605_144726"
+    else :
+        DIR_NAME= dir_name
     fname = LC.OUTPUT_ROOT_PATH_LOG + DIR_NAME + "/" + AP.ALGORISM
-    SPLIT = 1500 # 分割数
+    SPLIT = 50 # 分割数
     for i in range(AP.TRY):
         df = a.read_df(fname +"_"+ str(i) + ".csv")
         a.out.append(a.ep_action_split_n(df, SPLIT))
