@@ -49,8 +49,8 @@ class Agent:
     def run(self, index=0):
         c = 0
         for t in range(int(AP.EPISODE/AP.BATCH_SIZE)):
-            print(c)
             c+=1
+            # print(c)
             for episode in range(AP.BATCH_SIZE):
                 if self.modelname != "REINFORCE": self.model.eval()
                 s: List[int] = list(self.state)

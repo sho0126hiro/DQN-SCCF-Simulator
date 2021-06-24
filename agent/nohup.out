@@ -1,0 +1,25 @@
+agent.py:80: DtypeWarning: Columns (1,2,3,4,5) have mixed types.Specify dtype option on import or set low_memory=False.
+  main()
+[0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1]
+---------- Agent Config ----------
+modelname:  DQN
+C:  80
+T:  4
+Batch_size:  10
+rewards:  [1, 0, -1]
+---------- Model Config ----------
+alpha (learning rate):  0.01
+memory_capacity:  100
+gamma (Q discount rate) 0.1
+
+mini_batch_size 50
+input_size:  5
+output_size:  1
+
+epsilon_start:  0.2
+epsilon_end:  0.2
+epsilon_decay:  1000
+
+epoch:  5
+./log/20210428_160244/DQN_0.csv
+output_filename:  ./log/20210428_160244/DQN_0.csv
