@@ -37,7 +37,7 @@ class ModelParameter:
     # epsilonは指数関数的に減少させる
     epsilon_start = 0.2
     epsilon_decay = 1000
-    epsilon_end = 0.2
+    epsilon_end = 0.1
     epoch: int = 5
 
 

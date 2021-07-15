@@ -2,9 +2,9 @@
 from typing import NamedTuple, List
 
 class AgentParameter:
-    EPISODE: int = 3000 # episode数
-    C: int = 6 # 発話内容を特徴づけるパラメータの総数
-    T: int = 2 # エージェントが持つ、過去の発話履歴の長さ: T  (Tステップ前までの発話を保存)
+    EPISODE: int = 1200000 # episode数
+    C: int = 20 # 発話内容を特徴づけるパラメータの総数
+    T: int = 3 # エージェントが持つ、過去の発話履歴の長さ: T  (Tステップ前までの発話を保存)
     BATCH_SIZE: int = 3 # REINFORCEにおけるM, DQNにおけるBATCH
     REWARD: List[int] = [1, 0, -1]
     ALGORISM = "DQN_STOC" # REINFORCE, DQN, DDQN
