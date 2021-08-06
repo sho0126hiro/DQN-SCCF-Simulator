@@ -2,7 +2,7 @@
 from typing import NamedTuple, List
 
 class AgentParameter:
-    EPISODE: int = 1200000 # episode数
+    EPISODE: int = 400000 # episode数
     C: int = 20 # 発話内容を特徴づけるパラメータの総数
     T: int = 3 # エージェントが持つ、過去の発話履歴の長さ: T  (Tステップ前までの発話を保存)
     BATCH_SIZE: int = 3 # REINFORCEにおけるM, DQNにおけるBATCH

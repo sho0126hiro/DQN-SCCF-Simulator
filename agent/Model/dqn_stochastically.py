@@ -3,7 +3,7 @@
 """
 # Standard Import
 import sys
-from typing import List, NamedTuple
+from typing import List, NamedTuple, Union
 import random
 
 # ThirdParty Import
@@ -91,7 +91,7 @@ class DQN_STOC(AbstractModel):
         ind = np.random.choice(indices, p=tmp)
         return ind
 
-    def get_action_and_q(self, state: List[int]) -> [int, float]:
+    def get_action_and_q(self, state: List[int]) -> Union[int, float]:
         """
         行動とその行動のQ値を返す。
         """
